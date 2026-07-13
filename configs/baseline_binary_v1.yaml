@@ -1,0 +1,70 @@
+# ============================================================
+# Baseline Binary Classification Config (no KD)
+# Identical to kd_binary.yaml EXCEPT: no teacher, no KD loss.
+# Purpose: compare against KD run for fair ablation.
+#
+# Matched settings (same as kd_binary.yaml):
+#   - data:    ASPED_v1_npy  (same sessions as KD)
+#   - model:   VGGish + Transformer, token_dim=128, nhead=4
+#   - optim:   Adam lr=5e-4, weight_decay=0.01
+#   - trainer: max_epochs=1000, early_stopping patience=50 (monitor: val_quick/f1, mode=max)
+#   - val_check_interval: 0.1 (10% epoch, ~10.9K steps per check)
+# ============================================================
+
+seed: 42
+exp: baseline_binary_v1
+
+# ---- Data -------------------------------------------------------
+data_params:
+  feature_root_dir: "/media/ykim/Linux/ASPED_v1_npy"
+  transform: "vggish-mel"
+
+dataloader_params:
+  batch_size:  64
+  num_workers: 0
+
+# ---- Model ------------------------------------------------------
+model:
+  type: "base"
+  task: "classification"
+  token_dim:  128
+  nhead:      4
+  dropout:    0.2
+  num_layers: 1
+  n_classes:  2
+  binary_threshold: 0.5
+
+  optim:
+    type: Adam
+    args:
+      lr:           0.0005
+      weight_decay: 0.01
+
+# ---- Trainer ----------------------------------------------------
+trainer:
+  args:
+    max_epochs:      2
+    accelerator:     gpu
+    devices:         [0]
+    precision:       32
+    deterministic:   false
+    accumulate_grad_batches: 1
+    val_check_interval: 0.1   # validate every 10% of an epoch (~10.9K steps)
+
+  early_stopping:
+    monitor:  val_quick/macro_accuracy
+    patience: 10            # 10 checks × 0.1 epoch = 1 epoch without improvement
+    mode:     max
+    verbose:  true
+
+  logger:
+    save_dir: &save_dir "work_dir/baseline_binary_v1"
+    name: log
+
+  checkpoint:
+    dirpath: *save_dir
+    filename: best-{epoch:02d}-macc{val_quick/macro_accuracy:.4f}
+    auto_insert_metric_name: false
+    monitor: val_quick/macro_accuracy
+    mode:    max
+    save_top_k: 1

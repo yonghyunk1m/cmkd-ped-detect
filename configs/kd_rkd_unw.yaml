@@ -1,0 +1,63 @@
+seed: 42
+exp: kd_rkd_unw
+data_params:
+  feature_root_dir: /media/ykim/Linux/ASPED_v1_npy
+  embedding_dir: /media/ykim/Linux/ASPEDv1_VideoEmbeddings
+dataloader_params:
+  batch_size: 64
+  num_workers: 0
+model:
+  task: classification
+  n_classes: 2
+  token_dim: 128
+  nhead: 4
+  dropout: 0.2
+  num_layers: 1
+  optim:
+    type: Adam
+    args:
+      lr: 0.0005
+      weight_decay: 0.01
+  kd:
+    teacher_dim: 258
+    query_agg_type: attention
+    teacher_ckpt: /media/backup_SSD/Yonghyun/PedestrianDetection_KD/work_dir/Teacher_existence/Session_6012023/epoch=77-step=8796424.ckpt
+    kd_temperature: 3.0
+    focal_loss: true
+    focal_gamma: 2.0
+    use_logit_kd: false
+    use_uncertainty: false
+    kd_weight: 1.0
+    feature_kd:
+      enabled: true
+      feat_kd_type: rkd
+      teacher_feat_dim: 256
+      student_feat_dim: 128
+      proj_dim: 256
+      rkd_dist_weight: 1.0
+      rkd_angle_weight: 2.0
+trainer:
+  args:
+    max_epochs: 2
+    accelerator: gpu
+    devices:
+    - 0
+    precision: 32
+    deterministic: false
+    accumulate_grad_batches: 1
+    val_check_interval: 0.1
+  early_stopping:
+    monitor: val_quick/macro_accuracy
+    patience: 10
+    mode: max
+    verbose: true
+  logger:
+    save_dir: work_dir/kd_rkd_unw
+    name: log
+  checkpoint:
+    dirpath: work_dir/kd_rkd_unw
+    filename: best-{epoch:02d}-macc{val_quick/macro_accuracy:.4f}
+    auto_insert_metric_name: false
+    monitor: val_quick/macro_accuracy
+    mode: max
+    save_top_k: 1
