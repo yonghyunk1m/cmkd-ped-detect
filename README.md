@@ -8,6 +8,9 @@ Audio-only pedestrian detection on [ASPED v.a](https://huggingface.co/datasets/u
 
 ## Results — 5-fold LOSO (ASPED v.a)
 
+> **Status (July 2026).** A compute-server failure delayed the fold-level ECE and three PR-AUC aggregates. They will be posted here as soon as the server is restored, together with per-fold metric CSVs, and incorporated in the camera-ready version of the paper.
+
+
 | Method | Macro Acc | No-Ped | Ped | F1_Ped | *d* | *p* |
 |--------|:---------:|:------:|:---:|:------:|:---:|:---:|
 | Baseline (CE only) | 72.9 ± 1.8 | 63.5 | 82.3 | 0.286 | – | – |
