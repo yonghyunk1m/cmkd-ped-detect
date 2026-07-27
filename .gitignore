@@ -1,0 +1,3 @@
+results/predictions_loso/*.npz
+__pycache__/
+*.pyc

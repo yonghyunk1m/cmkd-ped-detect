@@ -1,0 +1,8 @@
+config       macro        No-Ped  Ped    F1_Ped  PR-AUC  ECE     d      p
+Baseline     72.9±1.8    63.5   82.3   28.6   0.328   0.366     --     --
+Hybrid_TFD   73.6±1.8    72.9   74.3   31.8   0.331   0.316   1.72  0.026
+LogitKD      73.6±1.7    70.8   76.4   31.2   0.332   0.329   1.17  0.079
+LogitKD_TFD  73.7±1.7    72.6   74.7   31.8   0.330   0.315   1.60  0.033
+
+Brier reliability (calibration):   baseline 0.163 -> Hybrid_TFD 0.110
+Brier resolution (discrimination): 0.011 (unchanged)
