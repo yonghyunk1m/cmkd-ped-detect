@@ -49,6 +49,27 @@ python scripts/loso_paired_tests.py
 
 Note: config files use the internal name `immune` for the TFD mask (and `selective` for a confidence-gated variant not reported in the paper).
 
+## Reproducing the ECE column
+
+The per-fold Expected Calibration Error (ECE) for the LOSO table is a **post-hoc** metric: it needs only the per-sample predicted pedestrian probability and the ground-truth label, so no retraining is required. The pieces to reproduce it are all available:
+
+- **checkpoints**: `work_dir/<config>/Session_<id>/best-*.ckpt` (one per LOSO fold),
+- **data**: ASPED v.a from the [dataset page](https://huggingface.co/datasets/urbanaudiosensing/ASPED),
+- **code**: `inference.py` (dump predictions) and `scripts/compute_ece_loso.py` (metric).
+
+```bash
+# 1. Dump per-fold predictions {prob, label} for a config (needs the v.a features + a GPU)
+for ckpt in work_dir/kd_logit_lossnorm/Session_*/best-*.ckpt; do
+    python inference.py --ckpt "$ckpt" --data-root /path/to/ASPED_v.a \
+        --save-npz results/predictions_loso/                 # writes <config>_<session>.npz
+done
+
+# 2. Aggregate ECE (10-bin) + Brier reliability/resolution to a 5-fold mean (no GPU)
+python scripts/compute_ece_loso.py --preds-dir results/predictions_loso --out results/loso_ece.csv
+```
+
+`compute_ece_loso.py` also runs directly on any existing `*.npz` dump of `{prob, label}` (and reproduces the single-session ECE / Brier decomposition reported in the paper's Sec. 5.3). The submitted paper reports the LOSO PR-AUC column and the single-session ECE; the fold-level ECE column will be added once these dumps are regenerated on a GPU host.
+
 ## Repository structure
 
 ```
