@@ -15,7 +15,7 @@ model:
     kd_temperature: 3.0
     kd_weight: 0.5
     query_agg_type: attention
-    teacher_ckpt: /media/backup_SSD/Yonghyun/PedestrianDetection_KD/work_dir/Teacher_existence/Session_6012023/epoch=77-step=8796424.ckpt
+    teacher_dir: work_dir/teacher_video_only   # per-fold LOSO teacher; train_kd.py picks <teacher_dir>/<test_session>/best-*.ckpt
     teacher_dim: 258
     use_logit_kd: true
     use_uncertainty: false

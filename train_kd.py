@@ -216,9 +216,16 @@ def main():
             teacher_ckpt = os.path.join(_loso_dir, _candidates[0])
             print(f"[KD] Auto-selected teacher ckpt: {teacher_ckpt}")
         else:
-            teacher_ckpt = config['model']['kd'].get('teacher_ckpt', None)
-            print(f"[KD] ⚠️  No LOSO teacher found in {_loso_dir}. "
-                  f"Falling back to config: {teacher_ckpt}")
+            # No silent fallback. A single shared checkpoint would put the
+            # held-out session inside the teacher head's training data for
+            # every fold but one, i.e. leakage. Fail loudly instead.
+            raise FileNotFoundError(
+                f"No per-fold teacher checkpoint found in {_loso_dir}.\n"
+                f"Expected <teacher_dir>/{args.test_session}/best-*.ckpt.\n"
+                f"Train the LOSO teachers first (train_teacher.py), or pass "
+                f"--teacher_ckpt explicitly if you intend to share one teacher "
+                f"across folds (this leaks the held-out session and must not be "
+                f"used for reported results).")
     config['model']['kd']['teacher_ckpt'] = teacher_ckpt
 
     # ---- Data ------------------------------------------------------------ #

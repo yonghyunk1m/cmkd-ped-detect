@@ -7,7 +7,7 @@
 #   - data:    ASPED_v1_npy  (same sessions as KD)
 #   - model:   VGGish + Transformer, token_dim=128, nhead=4
 #   - optim:   Adam lr=5e-4, weight_decay=0.01
-#   - trainer: max_epochs=1000, early_stopping patience=50 (monitor: val_quick/f1, mode=max)
+#   - trainer: max_epochs=2, early_stopping patience=10 (monitor: val_quick/macro_accuracy, mode=max)
 #   - val_check_interval: 0.1 (10% epoch, ~10.9K steps per check)
 # ============================================================
 

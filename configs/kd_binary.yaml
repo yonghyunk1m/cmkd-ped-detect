@@ -41,7 +41,7 @@ model:
   kd:
     teacher_dim:      258          # 256 visual + 2 metadata (confidence + GT count)
     query_agg_type:   "attention"  # "gap" | "attention"  (only used for local 256-dim files)
-    teacher_ckpt:     "/media/backup_SSD/Yonghyun/PedestrianDetection_KD/work_dir/Teacher_existence/Session_6012023/epoch=77-step=8796424.ckpt"
+    teacher_dir: work_dir/teacher_video_only   # per-fold LOSO teacher; train_kd.py picks <teacher_dir>/<test_session>/best-*.ckpt
     kd_temperature:   3.0
     focal_loss:       true
     focal_gamma:      2.0

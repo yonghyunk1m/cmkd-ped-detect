@@ -163,11 +163,17 @@ class ASPEDKDModel(ASPEDLightningModel):
         self.use_tad = kd_cfg.get('use_tad', False)
         tad_mode = kd_cfg.get('tad_mode', 'sp')  # 'sp', 'cg', 'learned', 'full'
         if self.use_tad:
+            # models/tad.py is not part of this release; the TAD configs are
+            # exploratory and are not among the eleven reported in the paper.
+            raise NotImplementedError(
+                "use_tad is not supported in this release (models/tad.py is "
+                "not included). None of the paper's reported configurations "
+                "uses it.")
             from models.tad import TADModule
             self.tad = TADModule(
                 mode=tad_mode,
                 modality='audio',
-                student_dim=token_dim,
+                student_dim=student_kwargs.get('token_dim', 128),
                 teacher_dim=teacher_dim,
                 sp_alpha=kd_cfg.get('tad_sp_alpha', 100.0),
                 sp_mu=kd_cfg.get('tad_sp_mu', 0.015),
@@ -504,10 +510,13 @@ class ASPEDKDModel(ASPEDLightningModel):
         valid_mask   = (labels.reshape(-1) >= 0)
 
         # ---- Trust-Filtered Distillation (TFD) mask construction ----
-        # Two trust criteria (paper Sec. 3.3, Eq. 2-3):
-        #   TFD-Conf  (`use_selective_kd`): teacher confidence >= threshold
-        #   TFD-Label (`immune_tolerance`): on minority, teacher agrees with GT
-        # `filter_teacher_errors` is an internal variant (any-class agreement).
+        # The paper reports only `immune_tolerance` (Eq. 4): on minority-class
+        # samples, drop KD when the teacher's no-pedestrian probability exceeds
+        # `immune_threshold` (0.4). NOTE this is a probability threshold, not an
+        # argmax test: at 0.4 it also covers minority samples the teacher gets
+        # right with P(ped) < 0.6.
+        # `use_selective_kd` and `filter_teacher_errors` are exploratory
+        # variants that are not reported.
         kd_mask = valid_mask.clone()
         if self.use_selective_kd:
             # TFD-Conf
@@ -520,7 +529,8 @@ class ASPEDKDModel(ASPEDLightningModel):
                 gt_flat = labels.reshape(-1).clamp(min=0)
                 kd_mask = kd_mask & (t_pred == gt_flat)
         if self.immune_tolerance:
-            # TFD-Label: suppress KD on minority samples where teacher pushes toward majority
+            # Eq. 4: suppress KD on minority samples where the teacher's target
+            # leans to the majority class (sigma(z_t)_0 > tau, tau = 0.4).
             # Minority = any pedestrian present (gt>=1), majority = class 0 (no pedestrian).
             with torch.no_grad():
                 t_probs = F.softmax(teacher_logits, dim=-1)
