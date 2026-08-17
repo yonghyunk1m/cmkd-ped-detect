@@ -1,0 +1,26 @@
+Brier reliability, lower is better. Recalibration fitted on the other four
+sessions, which are training data for the held-out fold.
+
+  held-out fold       baseline    +bias   +Platt      LogitKD LogitKD_TFD  Hybrid_TFD
+  session_5242023      0.1663   0.0005   0.0007      0.1086      0.1117      0.0991
+  session_6012023      0.1994   0.0022   0.0022      0.1256      0.1053      0.1165
+  session_6072023      0.1319   0.0006   0.0006      0.1034      0.1001      0.1063
+  session_6212023      0.1519   0.0012   0.0012      0.1307      0.1089      0.1122
+  session_6282023      0.1663   0.0006   0.0007      0.1202      0.1205      0.1167
+  MEAN                 0.1632   0.0010   0.0011      0.1177      0.1093      0.1102
+
+  LogitKD      vs baseline + cross-fold bias  : diff +0.1167  p=0.0000  -> recalibration better
+  LogitKD      vs baseline + cross-fold Platt : diff +0.1166  p=0.0000  -> recalibration better
+  LogitKD_TFD  vs baseline + cross-fold bias  : diff +0.1083  p=0.0000  -> recalibration better
+  LogitKD_TFD  vs baseline + cross-fold Platt : diff +0.1082  p=0.0000  -> recalibration better
+  Hybrid_TFD   vs baseline + cross-fold bias  : diff +0.1091  p=0.0000  -> recalibration better
+  Hybrid_TFD   vs baseline + cross-fold Platt : diff +0.1091  p=0.0000  -> recalibration better
+
+After recalibrating every model the same way, does KD keep any advantage?
+  Baseline     reliability 0.00108
+  LogitKD      reliability 0.00080
+  LogitKD_TFD  reliability 0.00084
+  Hybrid_TFD   reliability 0.00086
+  LogitKD      vs recalibrated baseline: diff -0.00028  p=0.4791
+  LogitKD_TFD  vs recalibrated baseline: diff -0.00024  p=0.4097
+  Hybrid_TFD   vs recalibrated baseline: diff -0.00023  p=0.4738
