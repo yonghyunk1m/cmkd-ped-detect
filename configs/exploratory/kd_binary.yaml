@@ -1,0 +1,82 @@
+# ============================================================
+# KD Binary Classification Config
+# Teacher: Mask2Former query embeddings → frozen MLP → binary
+# Student: VGGish + Transformer (binary pedestrian detection)
+# KD loss: temperature-scaled KL-Divergence
+# ============================================================
+
+seed: 42
+exp: kd_binary
+
+# ---- Data -------------------------------------------------------
+data_params:
+  # ASPED_v1 (2023 sessions) — the sessions that have pre-computed embeddings
+  feature_root_dir: "/path/to/ASPED_v.a"
+  embedding_dir:    "/path/to/teacher_embeddings"
+
+dataloader_params:
+  batch_size:  64
+  # Keep low to limit RAM from per-worker embedding caches.
+  # Set to 0 for single-process loading (safest for large embeddings).
+  num_workers: 0
+
+# ---- Model ------------------------------------------------------
+model:
+  task:       "classification"
+  n_classes:  2
+
+  # Student backbone settings (passed to ASPEDLightningModel)
+  token_dim:  128
+  nhead:      4
+  dropout:    0.2
+  num_layers: 1
+
+  optim:
+    type: Adam
+    args:
+      lr:           0.0005
+      weight_decay: 0.01
+
+  # KD-specific settings
+  kd:
+    teacher_dim:      258          # 256 visual + 2 metadata (confidence + GT count)
+    query_agg_type:   "attention"  # "gap" | "attention"  (only used for local 256-dim files)
+    teacher_ckpt:     "/path/to/teacher_checkpoint.ckpt"
+    kd_temperature:   3.0
+    focal_loss:       true
+    focal_gamma:      2.0
+    # Feature-level KD: align student transformer output with teacher 256-dim embedding
+    feature_kd:
+      enabled:          true
+      teacher_feat_dim: 256    # first 256 of 258-dim (drop conf + count metadata)
+      student_feat_dim: 128    # = token_dim (transformer output)
+      proj_dim:         256    # MLP projects student 128 → 256 to match teacher
+
+# ---- Trainer ----------------------------------------------------
+trainer:
+  args:
+    max_epochs:      3
+    accelerator:     gpu
+    devices:         [0]
+    precision:       32
+    deterministic:   false
+    accumulate_grad_batches: 1
+    val_check_interval: 0.1   # validate every 10% of an epoch (~10.9K steps)
+
+  early_stopping:
+    monitor:  val_quick/macro_accuracy
+    patience: 20            # 20 checks × 0.1 epoch = 2 epochs without improvement
+    mode:     max
+    verbose:  true
+
+  logger:
+    save_dir: &save_dir "work_dir/kd_binary"
+    name: log
+
+  checkpoint:
+    dirpath: *save_dir
+    filename: 'best-{epoch:02d}-{val_quick/macro_accuracy:.4f}'
+    auto_insert_metric_name: false
+    monitor: val_quick/f1
+    mode:    max
+    save_top_k: 1

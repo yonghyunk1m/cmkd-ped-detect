@@ -1,0 +1,47 @@
+# ==========================================
+# ASPED Regression Configuration
+# ==========================================
+
+seed: 42
+exp: seq2seq_regression
+
+data_params:
+  feature_root_dir: "/path/to/ASPED_v.c"
+
+dataloader_params:
+  batch_size: 256
+  num_workers: 6
+
+model:
+  task: "regression"
+  n_classes: 1
+  token_dim: 128
+  nhead: 4
+  dropout: 0.2
+
+  optim:
+    type: "Adam"
+    args:
+      lr: 0.0001
+      weight_decay: 0.01
+
+trainer:
+  args:
+    max_epochs: 20        
+    accelerator: "auto"
+    devices: 1
+    deterministic: false
+    check_val_every_n_epoch: 1
+    precision: 32
+
+  early_stopping:
+    monitor: "val_quick/loss"
+    patience: 3             
+    mode: "min"                
+    verbose: true           
+
+  logger:
+    save_dir: "work_dir/vggish_finetune_ASPED-c/regression"
+
+  checkpoint:
+    save_top_k: 1

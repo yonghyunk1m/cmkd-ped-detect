@@ -1,0 +1,28 @@
+# ============================================================
+# UNIFIED EXPERIMENT STANDARD (for fair KD comparison)
+# All future baseline + KD experiments should inherit these settings
+# ============================================================
+#
+# Rationale:
+#   - Step-based val_check is dataset-invariant (v1 epoch != v3 epoch)
+#   - patience=7 → stop after ~35 min stagnation at 7 it/s
+#   - max_epochs=2 acts as safety cap (~8.6 hr max)
+#
+# To apply: copy these keys into any baseline_*/kd_*.yaml file.
+# ============================================================
+
+trainer:
+  args:
+    max_epochs:      2
+    accelerator:     gpu
+    devices:         [0]
+    precision:       32
+    deterministic:   false
+    accumulate_grad_batches: 1
+    val_check_interval: 2000   # step-based (was 0.1 epoch)
+
+  early_stopping:
+    monitor:  val_quick/macro_accuracy
+    patience: 7                # 7 val checks = ~35 min at 7 it/s
+    mode:     max
+    verbose:  true

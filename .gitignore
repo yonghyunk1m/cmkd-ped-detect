@@ -1,0 +1,6 @@
+results/predictions_loso/*.npz
+__pycache__/
+*.pyc
+
+# keep the released LOSO prediction dumps (via LFS)
+!results/predictions_loso/*.npz

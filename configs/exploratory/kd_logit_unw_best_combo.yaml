@@ -1,0 +1,61 @@
+data_params:
+  embedding_dir: /path/to/teacher_embeddings
+  feature_root_dir: /path/to/ASPED_v.a
+dataloader_params:
+  batch_size: 64
+  num_workers: 0
+exp: kd_logit_unw_best_combo
+model:
+  dropout: 0.2
+  kd:
+    feature_kd:
+      enabled: false
+    focal_gamma: 2.0
+    focal_loss: true
+    kd_temperature: 3.0
+    kd_weight: 1.0
+    query_agg_type: attention
+    teacher_ckpt: /path/to/teacher_checkpoint.ckpt
+    teacher_dim: 258
+    use_logit_kd: true
+    use_uncertainty: false
+    tfd_mask: true
+    tfd_threshold: 0.4
+    kd_class_weighting: true
+    kd_shutoff_ratio: 0.8
+  n_classes: 2
+  nhead: 4
+  num_layers: 1
+  optim:
+    args:
+      lr: 0.0005
+      weight_decay: 0.01
+    type: Adam
+  task: classification
+  token_dim: 128
+seed: 42
+trainer:
+  args:
+    accelerator: gpu
+    accumulate_grad_batches: 1
+    deterministic: false
+    devices:
+    - 0
+    max_epochs: 1
+    precision: 32
+    val_check_interval: 0.1
+  checkpoint:
+    auto_insert_metric_name: false
+    dirpath: work_dir/kd_logit_unw_best_combo
+    filename: best-{epoch:02d}-macc{val_quick/macro_accuracy:.4f}
+    mode: max
+    monitor: val_quick/macro_accuracy
+    save_top_k: 1
+  early_stopping:
+    mode: max
+    monitor: val_quick/macro_accuracy
+    patience: 10
+    verbose: true
+  logger:
+    name: log
+    save_dir: work_dir/kd_logit_unw_best_combo

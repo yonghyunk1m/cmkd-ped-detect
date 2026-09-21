@@ -1,0 +1,16 @@
+# Core ML Framework
+torch>=2.0.0
+pytorch-lightning>=2.0.0
+torchaudio>=2.0.0
+
+# Data Manipulation & Computation
+numpy>=1.21.0
+pandas>=1.3.0
+
+# Experiment Configuration & Logging
+PyYAML>=6.0
+wandb>=0.12.0
+
+# Utilities
+tqdm>=4.64.0
+scikit-learn>=1.0.2

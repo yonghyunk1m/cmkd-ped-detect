@@ -1,0 +1,33 @@
+=== 5-fold means (recomputed from npz) ===
+      config  Macro  No-Ped    Ped     F1  PR-AUC    ECE    rel   posr
+    Baseline   72.9    63.5   82.3   28.6   0.328  0.366 0.1632  0.404   paper=(72.9, 63.5, 82.3, 28.6, 0.328)
+     LogitKD   73.6    70.8   76.4   31.2   0.332  0.329 0.1177  0.332   paper=(73.6, 70.8, 76.4, 31.2, 0.332)
+ LogitKD_TFD   73.7    72.6   74.7   31.8   0.330  0.315 0.1093  0.315   paper=(73.7, 72.6, 74.7, 31.8, 0.33)
+  Hybrid_TFD   73.6    72.9   74.3   31.8   0.331  0.316 0.1102  0.312   paper=(73.6, 72.9, 74.3, 31.8, 0.331)
+
+=== paired vs Baseline (5 folds; macro/F1/PR-AUC higher better, ECE/rel improvement=base-cfg) ===
+      config  metric mean_diff      d  perm_p  win/5               95% CI
+     LogitKD   macro    0.7264   1.17   0.125    4/5 [  0.2042,  1.2486]
+     LogitKD      f1    2.6061   1.35   0.125    4/5 [  0.8854,  4.5085]
+     LogitKD   prauc    0.0042   1.25   0.062    5/5 [  0.0015,  0.0075]
+     LogitKD     ece    0.0375   1.29   0.125    4/5 [  0.0101,  0.0616]
+     LogitKD     rel    0.0455   2.38   0.062    5/5 [  0.0291,  0.0618]
+
+ LogitKD_TFD   macro    0.7579   1.60   0.062    5/5 [  0.3508,  1.1624]
+ LogitKD_TFD      f1    3.1863   1.89   0.062    5/5 [  2.0299,  4.8908]
+ LogitKD_TFD   prauc    0.0020   0.45   0.375    3/5 [ -0.0018,  0.0059]
+ LogitKD_TFD     ece    0.0512   1.64   0.062    5/5 [  0.0274,  0.0804]
+ LogitKD_TFD     rel    0.0539   2.52   0.062    5/5 [  0.0386,  0.0748]
+
+  Hybrid_TFD   macro    0.6868   1.72   0.062    5/5 [  0.3393,  1.0342]
+  Hybrid_TFD      f1    3.1257   1.99   0.062    5/5 [  2.0152,  4.6739]
+  Hybrid_TFD   prauc    0.0030   0.53   0.500    2/5 [ -0.0018,  0.0079]
+  Hybrid_TFD     ece    0.0501   1.70   0.062    5/5 [  0.0241,  0.0761]
+  Hybrid_TFD     rel    0.0530   2.63   0.062    5/5 [  0.0361,  0.0711]
+
+Holm-Bonferroni over the 3 macro comparisons vs Baseline:
+   LogitKD_TFD  raw p=0.062  Holm p=0.188
+    Hybrid_TFD  raw p=0.062  Holm p=0.188
+       LogitKD  raw p=0.125  Holm p=0.188
+
+wrote loso_per_fold_from_npz.csv

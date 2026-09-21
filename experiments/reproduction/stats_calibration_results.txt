@@ -1,0 +1,29 @@
+n_folds=5 sessions=['5242023', '6012023', '6072023', '6212023', '6282023']
+
+      config               metric    base     cfg  improv      d  perm_p impr/5             95% CI
+     LogitKD                  ECE   0.366   0.329   0.037   1.29   0.125    4/5 [ 0.0101, 0.0616]
+     LogitKD          reliability   0.163   0.118   0.045   2.38   0.062    5/5 [ 0.0291, 0.0618]
+     LogitKD  resolution(control)   0.011   0.011   0.000   0.61   0.438    3/5 [-0.0001, 0.0009]
+
+ LogitKD_TFD                  ECE   0.366   0.315   0.051   1.64   0.062    5/5 [ 0.0274, 0.0804]
+ LogitKD_TFD          reliability   0.163   0.109   0.054   2.52   0.062    5/5 [ 0.0386, 0.0748]
+ LogitKD_TFD  resolution(control)   0.011   0.011   0.000   0.83   0.188    4/5 [ 0.0000, 0.0007]
+
+  Hybrid_TFD                  ECE   0.366   0.316   0.050   1.70   0.062    5/5 [ 0.0241, 0.0761]
+  Hybrid_TFD          reliability   0.163   0.110   0.053   2.63   0.062    5/5 [ 0.0361, 0.0711]
+  Hybrid_TFD  resolution(control)   0.011   0.011   0.000   0.75   0.250    3/5 [-0.0000, 0.0005]
+
+Holm-Bonferroni across the primary family (ECE & reliability, 6 tests):
+         LogitKD:reliability  raw p=0.062  Holm p=0.375  ns
+             LogitKD_TFD:ECE  raw p=0.062  Holm p=0.375  ns
+     LogitKD_TFD:reliability  raw p=0.062  Holm p=0.375  ns
+              Hybrid_TFD:ECE  raw p=0.062  Holm p=0.375  ns
+      Hybrid_TFD:reliability  raw p=0.062  Holm p=0.375  ns
+                 LogitKD:ECE  raw p=0.125  Holm p=0.375  ns
+
+Notes:
+ - Exact permutation p replaces the normality-assuming t-test at n=5.
+ - resolution (discrimination) should stay ns -> KD adds no ranking info.
+ - Minimum possible two-sided exact p at n=5 is 2/32 = 0.0625, so with only
+   5 folds NO single test can reach p<.05 by permutation; we therefore lean on
+   effect size + 5/5-fold consistency, and report this honestly.
